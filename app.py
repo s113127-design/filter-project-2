@@ -4,7 +4,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-st.title(""像個偉(偽)人一樣 📸part2")
+st.title("像個偉(偽)人一樣 📸part2")
 st.write("👉 請對鏡頭【比個耶 ✌️】來召喚至聖先師！")
 
 if "history" not in st.session_state:
