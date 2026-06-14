@@ -5,7 +5,7 @@ import mediapipe as mp
 import numpy as np
 
 st.title("🧙‍♂️ 孔子萬世師表濾鏡")
-st.write("👉 請對鏡頭【手心朝向自己，五指攤平】來召喚至聖先師！")
+st.write("👉 請對鏡頭【比個耶 ✌️】來召喚至聖先師！")
 
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -72,29 +72,22 @@ class VideoProcessor:
         face_results = self.face_mesh.process(rgb_img)
         hand_results = self.hands.process(rgb_img)
         
-        self.is_kongzi_active = False # 每格影格開始時先歸零
+        # 🎯 關鍵：每格影格一開始就將孔子狀態歸零，只要手放下效果就會立刻消失！
+        self.is_kongzi_active = False 
         
-        # ─── 手勢辨識：手心朝內攤平 ───
+        # ─── 手勢辨識：比耶 ✌️ ───
         if hand_results.multi_hand_landmarks:
             hand_landmarks = hand_results.multi_hand_landmarks[0].landmark
             
-            # 各手指尖與關節 Y 軸關係 (指尖 Y < 關節 Y 代表手指伸直攤平)
-            thumb_is_up = hand_landmarks[4].y < hand_landmarks[2].y
-            index_is_straight = hand_landmarks[8].y < hand_landmarks[6].y
-            middle_is_straight = hand_landmarks[12].y < hand_landmarks[10].y
-            ring_is_straight = hand_landmarks[16].y < hand_landmarks[14].y
-            pinky_is_straight = hand_landmarks[20].y < hand_landmarks[18].y
+            # 判斷每隻手指伸直或收起 (Y軸朝下，指尖 Y < 關節 Y 代表伸直)
+            index_is_straight = hand_landmarks[8].y < hand_landmarks[6].y   # 食指伸直
+            middle_is_straight = hand_landmarks[12].y < hand_landmarks[10].y # 中指伸直
+            ring_is_closed = hand_landmarks[16].y > hand_landmarks[14].y     # 無名指收起
+            pinky_is_closed = hand_landmarks[20].y > hand_landmarks[18].y     # 小指收起
             
-            # 五指全部伸直攤平
-            if thumb_is_up and index_is_straight and middle_is_straight and ring_is_straight and pinky_is_straight:
-                handedness = hand_results.multi_handedness[0].classification[0].label
-                # 配合鏡頭左右鏡像調整，判定手心是否朝向自己
-                if handedness == "Left": 
-                    if hand_landmarks[4].x > hand_landmarks[20].x:
-                        self.is_kongzi_active = True
-                else: 
-                    if hand_landmarks[4].x < hand_landmarks[20].x:
-                        self.is_kongzi_active = True
+            # 🎯 ✌️手勢演算法：只有食指和中指伸直，無名指和小指收起
+            if index_is_straight and middle_is_straight and ring_is_closed and pinky_is_closed:
+                self.is_kongzi_active = True
 
         # ─── 人臉特徵點與貼紙疊加 ───
         if face_results.multi_face_landmarks:
@@ -114,7 +107,7 @@ class VideoProcessor:
                     cap_w = int(face_width * 2.2)
                     cap_scale = kongzi_cap.shape[0] / kongzi_cap.shape[1]
                     cap_h = int(cap_w * cap_scale)
-                    cap_x = int(forehead.x * w - cap_w / 1.9)
+                    cap_x = int(forehead.x * w - cap_w / 1.8)
                     cap_y = int(forehead.y * h - cap_h * 0.45)
                     img = overlay_image(img, kongzi_cap, cap_x, cap_y, size=(cap_w, cap_h))
                     
@@ -136,7 +129,7 @@ class VideoProcessor:
                     s_y = h - s_h
                     img = overlay_image(img, kongzi_sleeves, s_x, s_y, size=(s_w, s_h))
 
-        # 🎯 這裡已經拿掉 cv2.putText，畫面上不再顯示任何調試英文字
+        # 🎯 這裡已經拿掉 cv2.putText，畫面上絕對不會再出現黃色除錯英文字
         self.latest_filter = img.copy()
         return frame.from_ndarray(img, format="bgr24")
 
