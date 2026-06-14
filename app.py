@@ -115,7 +115,7 @@ class VideoProcessor:
                     cap_scale = kongzi_cap.shape[0] / kongzi_cap.shape[1]
                     cap_h = int(cap_w * cap_scale)
                     cap_x = int(forehead.x * w - cap_w / 2)
-                    cap_y = int(forehead.y * h - cap_h * 0.85)
+                    cap_y = int(forehead.y * h - cap_h * 0.45)
                     img = overlay_image(img, kongzi_cap, cap_x, cap_y, size=(cap_w, cap_h))
                     
                 # B. 孔子鬍鬚
@@ -124,7 +124,7 @@ class VideoProcessor:
                     beard_scale = kongzi_beard.shape[0] / kongzi_beard.shape[1]
                     beard_h = int(beard_w * beard_scale)
                     beard_x = int(chin.x * w - beard_w / 2)
-                    beard_y = int(chin.y * h - beard_h * 0.15)
+                    beard_y = int(chin.y * h - beard_h * 0.45)
                     img = overlay_image(img, kongzi_beard, beard_x, beard_y, size=(beard_w, beard_h))
                     
                 # C. 古裝袖子在畫面最下方正中間
