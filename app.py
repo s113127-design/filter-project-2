@@ -107,7 +107,7 @@ class VideoProcessor:
                     cap_w = int(face_width * 2.2)
                     cap_scale = kongzi_cap.shape[0] / kongzi_cap.shape[1]
                     cap_h = int(cap_w * cap_scale)
-                    cap_x = int(forehead.x * w - cap_w / 2.1)
+                    cap_x = int(forehead.x * w - cap_w / 1.85)
                     cap_y = int(forehead.y * h - cap_h * 0.45)
                     img = overlay_image(img, kongzi_cap, cap_x, cap_y, size=(cap_w, cap_h))
                     
